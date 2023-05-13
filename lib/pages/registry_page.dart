@@ -42,11 +42,50 @@ class _RegistryState extends State<Registry> {
                 )).toList().sublist(0, 3),
               ),
               Column(
+                children: <Widget>[
+                  RadioListTile(
+                    activeColor: Colors.black,
+                    contentPadding: const EdgeInsets.only(left: 25),
+                    title: const Text("Male"),
+                    value: "male",
+                    groupValue: gender,
+                    onChanged: (value) {
+                      setState(() {
+                        gender = value.toString();
+                      });
+                    },
+                  ),
+                  RadioListTile(
+                    activeColor: Colors.black,
+                    contentPadding: const EdgeInsets.only(left: 25),
+                    title: const Text("Female"),
+                    value: "female",
+                    groupValue: gender,
+                    onChanged: (value) {
+                      setState(() {
+                        gender = value.toString();
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Column(
                 children: fields.map((field) =>
                     Container(
                       margin: const EdgeInsets.only(bottom: 10.0, left: 30.0, right: 30.0),
                       child: field,
                     )).toList().sublist(3, 5),
+              ),
+              CheckboxListTile(
+                title: const Text("I agree to the processing of personal data"),
+                value: isChecked,
+                onChanged: (newValue) {
+                  setState(() {
+                    isChecked = true;
+                  });
+                },
+                controlAffinity:
+                    ListTileControlAffinity.leading, //  <-- leading Checkbox
               ),
               Container(
                 decoration: BoxDecoration(

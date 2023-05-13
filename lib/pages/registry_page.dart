@@ -22,10 +22,10 @@ class _RegistryState extends State<Registry> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Scaffold(
-        backgroundColor: const Color(0xFFE6E6E6),
-        body: Center(
+    return Scaffold(
+      backgroundColor: const Color(0xFFE6E6E6),
+      body: SingleChildScrollView(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -35,11 +35,14 @@ class _RegistryState extends State<Registry> {
                     fontSize: 80.0,
                   )),
               Column(
-                children: fields.map((field) =>
-                Container(
-                  margin: const EdgeInsets.only(bottom: 10.0, left: 30.0, right: 30.0),
-                  child: field,
-                )).toList().sublist(0, 3),
+                children: fields
+                    .map((field) => Container(
+                          margin: const EdgeInsets.only(
+                              bottom: 10.0, left: 30.0, right: 30.0),
+                          child: field,
+                        ))
+                    .toList()
+                    .sublist(0, 3),
               ),
               Column(
                 children: <Widget>[
@@ -70,11 +73,14 @@ class _RegistryState extends State<Registry> {
                 ],
               ),
               Column(
-                children: fields.map((field) =>
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 10.0, left: 30.0, right: 30.0),
-                      child: field,
-                    )).toList().sublist(3, 5),
+                children: fields
+                    .map((field) => Container(
+                          margin: const EdgeInsets.only(
+                              bottom: 10.0, left: 30.0, right: 30.0),
+                          child: field,
+                        ))
+                    .toList()
+                    .sublist(3, 5),
               ),
               CheckboxListTile(
                 title: const Text("I agree to the processing of personal data"),
@@ -146,8 +152,8 @@ class _RegistryState extends State<Registry> {
               ),
             ],
           ),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
-      ),
+        ),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

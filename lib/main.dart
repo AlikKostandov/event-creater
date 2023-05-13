@@ -6,6 +6,6 @@ void main() => runApp(MaterialApp(
     initialRoute: '/login',
     routes: {
       '/login': (context) => const Login(),
-      '/registry': (context) => Registry(),
+      '/registry': (context) => const Registry(),
     }
 ));

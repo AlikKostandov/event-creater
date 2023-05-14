@@ -18,7 +18,7 @@ List<StylizedField> fields = [
 
 class _RegistryState extends State<Registry> {
   String? gender;
-  bool isChecked = false;
+  bool isChecked = true;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +29,14 @@ class _RegistryState extends State<Registry> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text('Registry',
-                  style: TextStyle(
-                    fontFamily: 'Khand',
-                    fontSize: 80.0,
-                  )),
+              const Padding(
+                padding: EdgeInsets.only(top: 30.0),
+                child: Text('Registry',
+                    style: TextStyle(
+                      fontFamily: 'Khand',
+                      fontSize: 80.0,
+                    )),
+              ),
               Column(
                 children: fields
                     .map((field) => Container(
@@ -48,8 +51,9 @@ class _RegistryState extends State<Registry> {
                 children: <Widget>[
                   RadioListTile(
                     activeColor: Colors.black,
-                    contentPadding: const EdgeInsets.only(left: 25),
-                    title: const Text("Male"),
+                    contentPadding: const EdgeInsets.only(left: 25.0),
+                    title: const Text("Male",
+                        style: TextStyle(fontFamily: 'Khand', fontSize: 24.0)),
                     value: "male",
                     groupValue: gender,
                     onChanged: (value) {
@@ -60,8 +64,12 @@ class _RegistryState extends State<Registry> {
                   ),
                   RadioListTile(
                     activeColor: Colors.black,
-                    contentPadding: const EdgeInsets.only(left: 25),
-                    title: const Text("Female"),
+                    contentPadding: const EdgeInsets.only(left: 25.0),
+                    title: const Text("Female",
+                        style: TextStyle(
+                          fontFamily: 'Khand',
+                          fontSize: 24.0,
+                        )),
                     value: "female",
                     groupValue: gender,
                     onChanged: (value) {

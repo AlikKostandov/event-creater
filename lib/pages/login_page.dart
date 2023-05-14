@@ -22,8 +22,16 @@ class _LoginState extends State<Login> {
                   fontFamily: 'Khand',
                   fontSize: 80.0,
                 )),
-            StylizedField(hintText: 'Phone or Email', isObscure: false),
-            StylizedField(hintText: 'Password', isObscure: true),
+            Container(
+                margin: const EdgeInsets.only(
+                    left: 30.0, right: 30.0, bottom: 30.0),
+                child: const StylizedField(
+                    hintText: 'Phone or Email', isObscure: false)),
+            Container(
+                margin: const EdgeInsets.only(
+                    left: 30.0, right: 30.0, bottom: 30.0),
+                child:
+                    const StylizedField(hintText: 'Password', isObscure: true)),
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50.0),

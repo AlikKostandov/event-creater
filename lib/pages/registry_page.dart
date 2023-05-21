@@ -1,7 +1,9 @@
-import 'package:event_creater/entities/stylized_field.dart';
+import 'package:event_creater/widgets/stylized_field.dart';
 import 'package:flutter/material.dart';
 
 import 'package:event_creater/widgets/header_widget.dart';
+
+import '../auth.dart';
 
 class Registry extends StatefulWidget {
   const Registry({super.key});
@@ -9,13 +11,15 @@ class Registry extends StatefulWidget {
   @override
   _RegistryState createState() => _RegistryState();
 }
+final TextEditingController _emailController = TextEditingController();
+final TextEditingController _passwordController = TextEditingController();
 
 List<StylizedField> fields = [
-  const StylizedField(hintText: "Name", isObscure: false),
-  const StylizedField(hintText: "Surname", isObscure: false),
-  const StylizedField(hintText: "Email", isObscure: false),
-  const StylizedField(hintText: "Password", isObscure: true),
-  const StylizedField(hintText: "Repeat a Password", isObscure: true),
+  StylizedField(hintText: "Name", isObscure: false),
+  StylizedField(hintText: "Surname", isObscure: false),
+  StylizedField.withController(hintText: "Email", isObscure: false, controller: _emailController),
+  StylizedField.withController(hintText: "Password", isObscure: true, controller: _passwordController),
+  StylizedField(hintText: "Repeat a Password", isObscure: true),
 ];
 
 class _RegistryState extends State<Registry> {
@@ -133,7 +137,11 @@ class _RegistryState extends State<Registry> {
                       ),
                     ),
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Auth().registerWithEmailAndPassword(
+                            _emailController.value.text,
+                            _passwordController.value.text);
+                      },
                       child: Container(
                         margin: const EdgeInsets.symmetric(
                             vertical: 10.0, horizontal: 25.0),

@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 class StylizedField extends StatelessWidget {
   final String hintText;
   final bool isObscure;
+  TextEditingController controller = TextEditingController();
 
-  const StylizedField(
+  StylizedField.withController(
+      {super.key, required this.hintText, required this.isObscure, required this.controller});
+
+  StylizedField(
       {super.key, required this.hintText, required this.isObscure});
-
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFF9F9797)),

@@ -120,7 +120,9 @@ class _LoginState extends State<Login> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {print('Clicked!')},
+        onPressed: () {
+          Auth().resetPassword(_emailController.text);
+        },
         tooltip: 'Forgot password',
         backgroundColor: const Color(0xfff39060),
         child: const Icon(Icons.password),

@@ -30,8 +30,8 @@ class StylizedField extends StatelessWidget {
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.only(left: 20.0),
           enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(width: 2.0, color: Colors.black),
-            borderRadius: BorderRadius.circular(18.0),
+            borderSide: const BorderSide(width: 1.5, color: Colors.black),
+            borderRadius: BorderRadius.circular(15.0),
           )),
       style: const TextStyle(fontSize: 20.0, fontFamily: 'Khand'),
       obscureText: isObscure,

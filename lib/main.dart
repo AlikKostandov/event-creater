@@ -61,10 +61,10 @@ class _MyAppState extends State<MyApp> {
           },
         ),
         theme: ThemeData(
-          primaryColor: const Color(0xff5b0060),
+          primaryColor: const Color(0xff090979),
           colorScheme: ColorScheme.fromSwatch().copyWith(
-              secondary: const Color(0xffffb56b)),
-          primarySwatch: Colors.deepOrange,
+              secondary: const Color(0xff00d4ff)),
+          primarySwatch: Colors.blue,
         ),
         initialRoute:
           FirebaseAuth.instance.currentUser == null ? '/login' : '/home',

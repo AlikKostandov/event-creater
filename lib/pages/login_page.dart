@@ -34,12 +34,14 @@ class _LoginState extends State<Login> {
                 children: <Widget>[
                   const Text('Sign Up',
                       style: TextStyle(
-                        fontFamily: 'Khand',
+                        fontFamily: 'Lobster',
+                        fontStyle: FontStyle.italic,
                         fontSize: 80.0,
+                        wordSpacing: -20
                       )),
                   Container(
                       margin: const EdgeInsets.only(
-                          left: 30.0, right: 30.0, bottom: 30.0),
+                          left: 30.0, right: 30.0, bottom: 30.0, top: 30),
                       child: StylizedField.withController(
                         hintText: 'Phone or Email',
                         isObscure: false,

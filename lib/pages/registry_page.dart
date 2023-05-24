@@ -102,7 +102,7 @@ List<StylizedField> fields = [
 ];
 
 class _RegistryState extends State<Registry> {
-  final double _headerHeight = 350;
+  final double _headerHeight = 150;
   final _formKey = GlobalKey<FormState>();
   String? gender;
   bool isChecked = true;
@@ -124,10 +124,10 @@ class _RegistryState extends State<Registry> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Padding(
-                    padding: EdgeInsets.only(top: 30.0),
+                    padding: EdgeInsets.only(top: 30.0, bottom: 30.0),
                     child: Text('Registry',
                         style: TextStyle(
-                          fontFamily: 'Khand',
+                          fontFamily: 'Lobster',
                           fontSize: 80.0,
                         )),
                   ),
@@ -148,11 +148,11 @@ class _RegistryState extends State<Registry> {
                         Column(
                           children: <Widget>[
                             RadioListTile(
-                              activeColor: Colors.black,
+                              activeColor: Colors.blue,
                               contentPadding: const EdgeInsets.only(left: 25.0),
                               title: const Text("Male",
                                   style: TextStyle(
-                                      fontFamily: 'Khand', fontSize: 24.0)),
+                                      fontFamily: 'Khand', fontSize: 22.0)),
                               value: "male",
                               groupValue: gender,
                               onChanged: (value) {
@@ -162,12 +162,12 @@ class _RegistryState extends State<Registry> {
                               },
                             ),
                             RadioListTile(
-                              activeColor: Colors.black,
+                              activeColor: Colors.blue,
                               contentPadding: const EdgeInsets.only(left: 25.0),
                               title: const Text("Female",
                                   style: TextStyle(
                                     fontFamily: 'Khand',
-                                    fontSize: 24.0,
+                                    fontSize: 22.0,
                                   )),
                               value: "female",
                               groupValue: gender,
@@ -265,7 +265,7 @@ class _RegistryState extends State<Registry> {
                                 fontSize: 18.0,
                                 decoration: TextDecoration.underline,
                                 fontFamily: 'Montserrat',
-                                color: Colors.black,
+                                color: Colors.blue,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 3.0,
                               ),

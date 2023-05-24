@@ -13,6 +13,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final double _headerHeight = 250;
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -28,6 +29,7 @@ class _LoginState extends State<Login> {
                 _headerHeight), //let's create a common header widget
           ),
           Form(
+            key: _formKey,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -42,18 +44,35 @@ class _LoginState extends State<Login> {
                   Container(
                       margin: const EdgeInsets.only(
                           left: 30.0, right: 30.0, bottom: 30.0, top: 30),
-                      child: StylizedField.withController(
-                        hintText: 'Phone or Email',
-                        isObscure: false,
-                        controller: _emailController,
-                      )),
+                      child: StylizedField.withControllerAndValidator(
+                          hintText: 'Email',
+                          isObscure: false,
+                          controller: _emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            } else {
+                              if (!value.contains("@")) {
+                                return 'Enter a valid email';
+                              } else {
+                                return null;
+                              }
+                            }
+                          })),
                   Container(
                       margin: const EdgeInsets.only(
                           left: 30.0, right: 30.0, bottom: 30.0),
-                      child: StylizedField.withController(
-                        hintText: 'Password',
-                        isObscure: true,
-                        controller: _passwordController,
+                      child: StylizedField.withControllerAndValidator(
+                          hintText: 'Password',
+                          isObscure: true,
+                          controller: _passwordController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            } else {
+                              return null;
+                            }
+                          }
                       )),
                   Container(
                     decoration: BoxDecoration(
@@ -76,9 +95,11 @@ class _LoginState extends State<Login> {
                     ),
                     child: TextButton(
                       onPressed: () {
-                        Auth().signInWithEmailAndPassword(
-                            _emailController.value.text,
-                            _passwordController.value.text);
+                        if (_formKey.currentState!.validate()) {
+                          Auth().signInWithEmailAndPassword(
+                              _emailController.value.text,
+                              _passwordController.value.text);
+                        }
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(
@@ -122,7 +143,9 @@ class _LoginState extends State<Login> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {print('Clicked!')},
+        onPressed: () {
+          Auth().resetPassword(_emailController.text);
+        },
         tooltip: 'Forgot password',
         backgroundColor: const Color(0xfff39060),
         child: const Icon(Icons.password),

@@ -8,18 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:event_creater/pages/login_page.dart';
 import 'package:event_creater/pages/registry_page.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -62,17 +58,16 @@ class _MyAppState extends State<MyApp> {
         ),
         theme: ThemeData(
           primaryColor: const Color(0xff090979),
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-              secondary: const Color(0xff00d4ff)),
+          colorScheme: ColorScheme.fromSwatch()
+              .copyWith(secondary: const Color(0xff00d4ff)),
           primarySwatch: Colors.blue,
         ),
         initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/login' : '/home',
+            FirebaseAuth.instance.currentUser == null ? '/login' : '/home',
         routes: {
           '/login': (context) => const Login(),
           '/registry': (context) => const Registry(),
           '/home': (context) => const Home()
-        }
-    );
+        });
   }
 }

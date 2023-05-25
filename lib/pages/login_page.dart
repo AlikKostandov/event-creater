@@ -155,14 +155,18 @@ class _LoginState extends State<Login> {
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             try {
-               await Auth().resetPassword(_emailController.text);
-               ScaffoldMessenger.of(context).showSnackBar(
-                 const SnackBar(content: Text('A link to restore your account has been sent to your email')),
-               );
+              await Auth().resetPassword(_emailController.text);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text(
+                        'A link to restore your account has been sent to your email')),
+              );
             } on FirebaseAuthException catch (e) {
               if (e.code == 'user-not-found' || e.code == 'invalid-email') {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Email is specified incorrectly or there is no such account')),
+                  const SnackBar(
+                      content: Text(
+                          'Email is specified incorrectly or there is no such account')),
                 );
               }
             }

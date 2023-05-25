@@ -1,4 +1,5 @@
 import 'package:event_creater/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:event_creater/widgets/stylized_field.dart';
 
@@ -36,11 +37,10 @@ class _LoginState extends State<Login> {
                 children: <Widget>[
                   const Text('Sign Up',
                       style: TextStyle(
-                        fontFamily: 'Lobster',
-                        fontStyle: FontStyle.italic,
-                        fontSize: 80.0,
-                        wordSpacing: -20
-                      )),
+                          fontFamily: 'Lobster',
+                          fontStyle: FontStyle.italic,
+                          fontSize: 80.0,
+                          wordSpacing: -20)),
                   Container(
                       margin: const EdgeInsets.only(
                           left: 30.0, right: 30.0, bottom: 30.0, top: 30),
@@ -72,8 +72,7 @@ class _LoginState extends State<Login> {
                             } else {
                               return null;
                             }
-                          }
-                      )),
+                          })),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(50.0),
@@ -94,11 +93,21 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     child: TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          Auth().signInWithEmailAndPassword(
-                              _emailController.value.text,
-                              _passwordController.value.text);
+                          try {
+                            await Auth().signInWithEmailAndPassword(
+                                _emailController.value.text,
+                                _passwordController.value.text);
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'user-not-found') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Incorrect login or password')),
+                              );
+                            }
+                          }
                         }
                       },
                       child: Container(
@@ -143,8 +152,21 @@ class _LoginState extends State<Login> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Auth().resetPassword(_emailController.text);
+        onPressed: () async {
+          if (_formKey.currentState!.validate()) {
+            try {
+               await Auth().resetPassword(_emailController.text);
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(content: Text('A link to restore your account has been sent to your email')),
+               );
+            } on FirebaseAuthException catch (e) {
+              if (e.code == 'user-not-found' || e.code == 'invalid-email') {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Email is specified incorrectly or there is no such account')),
+                );
+              }
+            }
+          }
         },
         tooltip: 'Forgot password',
         backgroundColor: const Color(0xfff39060),

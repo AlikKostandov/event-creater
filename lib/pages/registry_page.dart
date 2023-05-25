@@ -1,4 +1,5 @@
 import 'package:event_creater/widgets/stylized_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:event_creater/widgets/header_widget.dart';
@@ -221,7 +222,7 @@ class _RegistryState extends State<Registry> {
                             ),
                           ),
                           child: TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 if (gender == null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -236,9 +237,20 @@ class _RegistryState extends State<Registry> {
                                             'You must allow us to process your personal data')),
                                   );
                                 } else {
-                                  Auth().registerWithEmailAndPassword(
-                                      _emailController.value.text,
-                                      _passwordController.value.text);
+                                  try {
+                                    await Auth().registerWithEmailAndPassword(
+                                        _emailController.value.text,
+                                        _passwordController.value.text);
+                                  } on FirebaseAuthException catch (e) {
+                                    if (e.code == 'email-already-in-use') {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'The account already exists for that email')),
+                                      );
+                                    }
+                                  }
                                 }
                               }
                             },

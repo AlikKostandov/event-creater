@@ -195,7 +195,7 @@ class _RegistryState extends State<Registry> {
                           value: isChecked,
                           onChanged: (newValue) {
                             setState(() {
-                              isChecked = true;
+                              isChecked = !isChecked;
                             });
                           },
                           controlAffinity: ListTileControlAffinity
@@ -228,6 +228,12 @@ class _RegistryState extends State<Registry> {
                                     const SnackBar(
                                         content:
                                             Text('You don\'t choose gender')),
+                                  );
+                                } else if (isChecked == false) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'You must allow us to process your personal data')),
                                   );
                                 } else {
                                   Auth().registerWithEmailAndPassword(

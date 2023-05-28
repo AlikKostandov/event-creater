@@ -125,11 +125,12 @@ class _RegistryState extends State<Registry> {
                 children: <Widget>[
                   const Padding(
                     padding: EdgeInsets.only(top: 30.0, bottom: 30.0),
-                    child: Text('Registry',
+                    child: Text('Sign Up',
                         style: TextStyle(
-                          fontFamily: 'Lobster',
-                          fontSize: 80.0,
-                        )),
+                            fontFamily: 'Lobster',
+                            fontSize: 80.0,
+                            fontStyle: FontStyle.italic,
+                            wordSpacing: -20)),
                   ),
                   Form(
                     key: _formKey,
@@ -152,7 +153,7 @@ class _RegistryState extends State<Registry> {
                               contentPadding: const EdgeInsets.only(left: 25.0),
                               title: const Text("Male",
                                   style: TextStyle(
-                                      fontFamily: 'Khand', fontSize: 22.0)),
+                                      fontFamily: 'Mukta', fontSize: 22.0)),
                               value: "male",
                               groupValue: gender,
                               onChanged: (value) {
@@ -166,7 +167,7 @@ class _RegistryState extends State<Registry> {
                               contentPadding: const EdgeInsets.only(left: 25.0),
                               title: const Text("Female",
                                   style: TextStyle(
-                                    fontFamily: 'Khand',
+                                    fontFamily: 'Mukta',
                                     fontSize: 22.0,
                                   )),
                               value: "female",

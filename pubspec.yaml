@@ -77,15 +77,15 @@ flutter:
     # list giving the asset and other descriptors for the font. For
     # example:
   fonts:
-    - family: Khand
-      fonts:
-        - asset: fonts/Khand-Regular.ttf
     - family: Montserrat
       fonts:
         - asset: fonts/Montserrat-Thin.ttf
     - family: Lobster
       fonts:
         - asset: fonts/LobsterTwo-Regular.ttf
+    - family: Mukta
+      fonts:
+        - asset: fonts/Mukta-Light.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

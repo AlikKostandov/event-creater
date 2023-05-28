@@ -34,7 +34,7 @@ class _LoginState extends State<Login> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Text('Sign Up',
+                  const Text('Sign In',
                       style: TextStyle(
                         fontFamily: 'Lobster',
                         fontStyle: FontStyle.italic,

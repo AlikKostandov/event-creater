@@ -33,7 +33,7 @@ class StylizedField extends StatelessWidget {
             borderSide: const BorderSide(width: 1.5, color: Colors.black),
             borderRadius: BorderRadius.circular(15.0),
           )),
-      style: const TextStyle(fontSize: 20.0, fontFamily: 'Khand'),
+      style: const TextStyle(fontSize: 20.0, fontFamily: 'Mukta'),
       obscureText: isObscure,
     );
   }

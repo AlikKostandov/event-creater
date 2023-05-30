@@ -58,7 +58,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _myKey = new GlobalKey<ScaffoldState>();
+
     return Scaffold(
+        key: _myKey,
         backgroundColor: const Color(0xFFE6E6E6),
         body: Column(
           children: [
@@ -90,12 +93,7 @@ class _HomeState extends State<Home> {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () async {
-                          await FirebaseAuth.instance.signOut().then((value) {
-                            Navigator.pushNamed(context, "/login");
-                          });
-                          return;
-                        },
+                        onPressed: () => _myKey.currentState?.openEndDrawer(),
                         icon: const Icon(Icons.menu),
                         color: Colors.black,
                         iconSize: 40,
@@ -109,10 +107,99 @@ class _HomeState extends State<Home> {
             Expanded(
                 child: ListView(
               children: events,
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
             )),
           ],
+        ),
+        endDrawer: Drawer(
+          width: 250.0,
+          child: ListView(
+            padding: const EdgeInsets.only(left: 50.0, top: 30.0),
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.person),
+                  TextButton(
+                      onPressed: () {
+                        print('Profile');
+                      },
+                      child: Text(
+                        'Profile'.toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Mukta',
+                            letterSpacing: 2.0),
+                      ))
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.question_mark),
+                  TextButton(
+                      onPressed: () {
+                        print('About us');
+                      },
+                      child: Text(
+                        'About'.toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Mukta',
+                            letterSpacing: 2.0),
+                      ))
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.settings),
+                  TextButton(
+                      onPressed: () {
+                        print('Settings');
+                      },
+                      child: Text(
+                        'Settings'.toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Mukta',
+                            letterSpacing: 2.0),
+                      ))
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.archive),
+                  TextButton(
+                      onPressed: () {
+                        print('Archive');
+                      },
+                      child: Text(
+                        'Archive'.toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Mukta',
+                            letterSpacing: 2.0),
+                      ))
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.login_outlined),
+                  TextButton(
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut().then((value) {
+                          Navigator.pushNamed(context, "/login");
+                        });
+                        return;
+                      },
+                      child: Text(
+                        'Logout'.toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20.0, fontFamily: 'Mukta'),
+                      ))
+                ],
+              )
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,

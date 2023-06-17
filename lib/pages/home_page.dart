@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:core';
+
+import 'package:event_creater/entity/event_entity.dart';
+import 'package:event_creater/entity/simple_user.dart';
 import 'package:event_creater/widgets/event_box.dart';
+import 'package:event_creater/widgets/header_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import 'package:event_creater/widgets/header_widget.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -55,6 +60,38 @@ Future<String?> signOut(BuildContext context) async {
 
 class _HomeState extends State<Home> {
   final double _headerHeight = 150;
+  User? user;
+  SimpleUser? simpleUser;
+
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      getUser(user!.email);
+    }
+  }
+
+  Future<void> getUser(String? email) async {
+    final response = await http
+        .get(Uri.parse('{ipAddress}/event-creater/users?email=${email!}'));
+    if (response.statusCode == 200) {
+      String jsonBody = response.body;
+      dynamic data = jsonDecode(jsonBody);
+      setState(() {
+        simpleUser = SimpleUser.fromJson(data);
+      });
+    } else {
+      print('Ошибка: ${response.statusCode}');
+    }
+  }
+
+  List<EventEntity> parseMyObjects(String jsonStr) {
+    final parsed = jsonDecode(jsonStr).cast<Map<String, dynamic>>();
+    return parsed
+        .map<EventEntity>((json) => EventEntity.fromJson(json))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,25 +108,49 @@ class _HomeState extends State<Home> {
                 child: HeaderWidget(
                     _headerHeight), //let's create a common header widget
               ),
+              // Header with avatar shape and userInfo
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 20.0, top: 50.0),
-                    child: Container(
-                        height: 140.0,
-                        width: 140.0,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 10.0,
-                              color: const Color(0xFFE6E6E6),
-                            ),
-                            borderRadius: BorderRadius.circular(100)),
-                        child: const CircleAvatar(
-                          backgroundImage: AssetImage('assets/img_avatar.png'),
-                        )),
+                    padding: const EdgeInsets.only(
+                        left: 20.0, top: 50.0, bottom: 20.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Avatar shape
+                        Container(
+                            height: 140.0,
+                            width: 140.0,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 10.0,
+                                  color: const Color(0xFFE6E6E6),
+                                ),
+                                borderRadius: BorderRadius.circular(100)),
+                            child: const CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/img_avatar.png'),
+                            )),
+                        // UserInfo fields
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("${simpleUser?.name} ${simpleUser?.surname}",
+                                style: const TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.w800)),
+                            Text(
+                                "${simpleUser?.gender} ${simpleUser?.birthDt ?? ""}",
+                                style: const TextStyle(
+                                    fontSize: 14.0, color: Colors.grey)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
+                  // Icon for open drawer
                   Row(
                     children: [
                       IconButton(
@@ -104,14 +165,16 @@ class _HomeState extends State<Home> {
                 ],
               ),
             ]),
+            // List of events
             Expanded(
                 child: ListView(
-              children: events,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
+              children: events,
             )),
           ],
         ),
+        // Drawer menu
         endDrawer: Drawer(
           width: 250.0,
           child: ListView(
@@ -201,6 +264,7 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
+        // Bottom navigation bar
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,

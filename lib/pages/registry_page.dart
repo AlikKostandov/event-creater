@@ -1,9 +1,16 @@
+import 'dart:io';
+
+import 'package:event_creater/entity/simple_user.dart';
 import 'package:event_creater/widgets/stylized_field.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:event_creater/widgets/header_widget.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../auth.dart';
 
@@ -16,11 +23,16 @@ class Registry extends StatefulWidget {
 
 final TextEditingController _emailController = TextEditingController();
 final TextEditingController _passwordController = TextEditingController();
+final TextEditingController _nameController = TextEditingController();
+final TextEditingController _surnameController = TextEditingController();
+final TextEditingController _birthController = TextEditingController();
 
+// Setting the basic parameters for the text fields of the registration form
 List<StylizedField> fields = [
-  StylizedField.withValidator(
+  StylizedField.withControllerAndValidator(
       hintText: "Name",
       isObscure: false,
+      controller: _nameController,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter your Name';
@@ -32,9 +44,10 @@ List<StylizedField> fields = [
           }
         }
       }),
-  StylizedField.withValidator(
+  StylizedField.withControllerAndValidator(
       hintText: "Surname",
       isObscure: false,
+      controller: _surnameController,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter your Surname';
@@ -107,6 +120,43 @@ class _RegistryState extends State<Registry> {
   final _formKey = GlobalKey<FormState>();
   String? gender;
   bool isChecked = true;
+  DateTime currentDate =
+      DateTime.now().subtract(const Duration(days: 365 * 18));
+
+  /// Calendar setting function
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: currentDate,
+        firstDate: DateTime(1950),
+        lastDate: DateTime(2024));
+    if (pickedDate != null && pickedDate != currentDate) {
+      setState(() {
+        currentDate = pickedDate;
+        _birthController.text = DateFormat('dd.MM.yyyy').format(currentDate);
+      });
+    }
+  }
+
+  /// The function of user registration in the database
+  Future<void> registerUser() async {
+    SimpleUser user = SimpleUser(
+        name: _nameController.text,
+        surname: _surnameController.text,
+        gender: gender!,
+        birthDt: DateFormat('yyyy-MM-dd').format(currentDate),
+        email: _emailController.text);
+    var jsonBody = jsonEncode(user.toJson());
+    final response = await http.post(
+        Uri.parse('http://192.168.1.120:9000/event-creater/users/registry'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonBody);
+    if (response.statusCode != 200) {
+      throw HttpException;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +167,14 @@ class _RegistryState extends State<Registry> {
           children: <Widget>[
             SizedBox(
               height: _headerHeight,
-              child: HeaderWidget(
-                  _headerHeight), //let's create a common header widget
+              child: HeaderWidget(_headerHeight),
             ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Padding(
-                    padding: EdgeInsets.only(top: 30.0, bottom: 30.0),
+                    padding: EdgeInsets.only(top: 10.0, bottom: 30.0),
                     child: Text('Sign Up',
                         style: TextStyle(
                             fontFamily: 'Lobster',
@@ -137,6 +186,7 @@ class _RegistryState extends State<Registry> {
                     key: _formKey,
                     child: Column(
                       children: [
+                        // Fields for name, surname and email
                         Column(
                           children: fields
                               .map((field) => Container(
@@ -147,6 +197,40 @@ class _RegistryState extends State<Registry> {
                               .toList()
                               .sublist(0, 3),
                         ),
+                        // Field for birthday
+                        Container(
+                          margin: const EdgeInsets.only(
+                              bottom: 10.0, left: 30.0, right: 170.0),
+                          child: TextFormField(
+                            controller: _birthController,
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your Birthday';
+                              }
+                            },
+                            decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.calendar_today),
+                                  onPressed: () => _selectDate(context),
+                                ),
+                                hintText: "Birthdate",
+                                hintStyle:
+                                    const TextStyle(color: Color(0xFF9F9797)),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding:
+                                    const EdgeInsets.only(left: 20.0),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      width: 1.5, color: Colors.black),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                )),
+                            style: const TextStyle(
+                                fontSize: 20.0, fontFamily: 'Mukta'),
+                          ),
+                        ),
+                        // Radios responsible for the users gender
                         Column(
                           children: <Widget>[
                             RadioListTile(
@@ -155,7 +239,7 @@ class _RegistryState extends State<Registry> {
                               title: const Text("Male",
                                   style: TextStyle(
                                       fontFamily: 'Mukta', fontSize: 22.0)),
-                              value: "male",
+                              value: "Male",
                               groupValue: gender,
                               onChanged: (value) {
                                 setState(() {
@@ -171,7 +255,7 @@ class _RegistryState extends State<Registry> {
                                     fontFamily: 'Mukta',
                                     fontSize: 22.0,
                                   )),
-                              value: "female",
+                              value: "Female",
                               groupValue: gender,
                               onChanged: (value) {
                                 setState(() {
@@ -181,6 +265,7 @@ class _RegistryState extends State<Registry> {
                             ),
                           ],
                         ),
+                        //Fields for password
                         Column(
                           children: fields
                               .map((field) => Container(
@@ -191,6 +276,7 @@ class _RegistryState extends State<Registry> {
                               .toList()
                               .sublist(3, 5),
                         ),
+                        // The checkbox responsible for confidentiality
                         CheckboxListTile(
                           title: const Text(
                               "I agree to the processing of personal data"),
@@ -252,6 +338,15 @@ class _RegistryState extends State<Registry> {
                                       );
                                     }
                                   }
+                                  try {
+                                    await registerUser();
+                                  } on HttpException {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Failed to save the user. Try again later')),
+                                    );
+                                  }
                                 }
                               }
                             },
@@ -273,7 +368,7 @@ class _RegistryState extends State<Registry> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
                           child: TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/login');

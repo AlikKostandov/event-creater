@@ -16,37 +16,6 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-List<EventBox> events = [
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021'),
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021'),
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021'),
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021'),
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021'),
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021'),
-  const EventBox(
-      color: Colors.grey,
-      name: 'John’s Friday Party',
-      description: 'John Thompson - 27/06/2021')
-];
-
 Future<String?> signOut(BuildContext context) async {
   try {
     await FirebaseAuth.instance.signOut().then((value) {
@@ -60,6 +29,7 @@ Future<String?> signOut(BuildContext context) async {
 
 class _HomeState extends State<Home> {
   final double _headerHeight = 150;
+  List<EventEntity>? events;
   User? user;
   SimpleUser? simpleUser;
 
@@ -72,6 +42,7 @@ class _HomeState extends State<Home> {
     }
   }
 
+  // Get SimpleUser by email of auth User
   Future<void> getUser(String? email) async {
     final response = await http
         .get(Uri.parse('{ipAddress}/event-creater/users?email=${email!}'));
@@ -81,16 +52,29 @@ class _HomeState extends State<Home> {
       setState(() {
         simpleUser = SimpleUser.fromJson(data);
       });
+      if (simpleUser != null) {
+        getUserEvents(simpleUser!.id);
+      }
     } else {
       print('Ошибка: ${response.statusCode}');
     }
   }
 
-  List<EventEntity> parseMyObjects(String jsonStr) {
-    final parsed = jsonDecode(jsonStr).cast<Map<String, dynamic>>();
-    return parsed
-        .map<EventEntity>((json) => EventEntity.fromJson(json))
-        .toList();
+  // Get events list by SimpleUser's id
+  Future<void> getUserEvents(int? id) async {
+    if (id != null) {
+      final response = await http.get(Uri.parse(
+          '{ipAddress}/event-creater/events?userId=$id'));
+      if (response.statusCode == 200) {
+        String jsonBody = response.body;
+        final parsed = jsonDecode(jsonBody).cast<Map<String, dynamic>>();
+        events = parsed
+            .map<EventEntity>((json) => EventEntity.fromJson(json))
+            .toList();
+      } else {
+        print('Ошибка: ${response.statusCode}');
+      }
+    }
   }
 
   @override
@@ -170,7 +154,9 @@ class _HomeState extends State<Home> {
                 child: ListView(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
-              children: events,
+              children: events == null
+                  ? []
+                  : events!.map((e) => EventBox(event: e)).toList(),
             )),
           ],
         ),

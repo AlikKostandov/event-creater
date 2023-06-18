@@ -144,7 +144,7 @@ class _RegistryState extends State<Registry> {
         name: _nameController.text,
         surname: _surnameController.text,
         gender: gender!,
-        birthDt: DateFormat('yyyy-MM-dd').format(currentDate),
+        birthDt: currentDate,
         email: _emailController.text);
     var jsonBody = jsonEncode(user.toJson());
     final response = await http.post(

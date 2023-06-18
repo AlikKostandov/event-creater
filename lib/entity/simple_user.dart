@@ -1,13 +1,14 @@
 //Simple user entity
+import 'package:intl/intl.dart';
+
 class SimpleUser {
   int? id;
   String name;
   String surname;
-  String birthDt;
+  DateTime birthDt;
   String gender;
   String email;
   String? tel;
-  String? regDt;
 
   SimpleUser(
       {this.id,
@@ -16,34 +17,37 @@ class SimpleUser {
       required this.birthDt,
       required this.gender,
       required this.email,
-      this.tel,
-      this.regDt});
+      this.tel});
 
   //Json -> SimpleUser
   factory SimpleUser.fromJson(Map<String, dynamic> json) {
+    final birthDtInfo = json['birthDt'];
+    DateFormat format = DateFormat('yyyy-MM-dd');
+    DateTime birthInCorrectFormat = format.parse(birthDtInfo);
+
     return SimpleUser(
-      id: json['userid'],
+      id: json['userId'],
       name: json['name'],
       surname: json['surname'],
-      birthDt: json['birthDt'],
+      birthDt: birthInCorrectFormat,
       gender: json['gender'],
       email: json['email'],
       tel: json['tel'],
-      regDt: json['registrationDt'],
     );
   }
 
   //SimpleUser -> Json
   Map<String, dynamic> toJson() {
+    String birthDtInCorrectFormat = DateFormat('yyyy-MM-dd').format(birthDt);
+
     return {
       'userId': id,
       'name': name,
       'surname': surname,
-      'birthDt': birthDt,
+      'birthDt': birthDtInCorrectFormat,
       'gender': gender,
       'email': email,
       'tel': tel,
-      'registrationDt': regDt
     };
   }
 }

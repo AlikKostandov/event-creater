@@ -8,6 +8,7 @@ import 'package:event_creater/widgets/header_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -126,7 +127,7 @@ class _HomeState extends State<Home> {
                                     fontSize: 24.0,
                                     fontWeight: FontWeight.w800)),
                             Text(
-                                "${simpleUser?.gender} ${simpleUser?.birthDt ?? ""}",
+                                "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('dd MMMM yyyy').format(simpleUser!.birthDt) : ""}",
                                 style: const TextStyle(
                                     fontSize: 14.0, color: Colors.grey)),
                           ],

@@ -127,7 +127,7 @@ class _HomeState extends State<Home> {
                                     fontSize: 24.0,
                                     fontWeight: FontWeight.w800)),
                             Text(
-                                "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('dd MMMM yyyy').format(simpleUser!.birthDt) : ""}",
+                                "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('d MMMM yyyy').format(simpleUser!.birthDt) : ""}",
                                 style: const TextStyle(
                                     fontSize: 14.0, color: Colors.grey)),
                           ],
@@ -247,7 +247,23 @@ class _HomeState extends State<Home> {
                             fontSize: 20.0, fontFamily: 'Mukta'),
                       ))
                 ],
-              )
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.add),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/add");
+                      },
+                      child: Text(
+                        'Create event'.toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Mukta',
+                            letterSpacing: 2.0),
+                      ))
+                ],
+              ),
             ],
           ),
         ),

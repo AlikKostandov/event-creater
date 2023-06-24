@@ -127,7 +127,7 @@ class _HomeState extends State<Home> {
                                     fontSize: 24.0,
                                     fontWeight: FontWeight.w800)),
                             Text(
-                                "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('d MMMM yyyy').format(simpleUser!.birthDt) : ""}",
+                                "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('d MMMM yyyy').format(simpleUser!.birthDt!) : ""}",
                                 style: const TextStyle(
                                     fontSize: 14.0, color: Colors.grey)),
                           ],
@@ -253,7 +253,8 @@ class _HomeState extends State<Home> {
                   const Icon(Icons.add),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/add");
+                        Navigator.pushNamed(context, "/add",
+                            arguments: simpleUser!.id);
                       },
                       child: Text(
                         'Create event'.toUpperCase(),

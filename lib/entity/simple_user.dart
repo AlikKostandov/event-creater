@@ -3,20 +3,20 @@ import 'package:intl/intl.dart';
 
 class SimpleUser {
   int? id;
-  String name;
-  String surname;
-  DateTime birthDt;
-  String gender;
-  String email;
+  String? name;
+  String? surname;
+  DateTime? birthDt;
+  String? gender;
+  String? email;
   String? tel;
 
   SimpleUser(
       {this.id,
-      required this.name,
-      required this.surname,
-      required this.birthDt,
-      required this.gender,
-      required this.email,
+      this.name,
+      this.surname,
+      this.birthDt,
+      this.gender,
+      this.email,
       this.tel});
 
   //Json -> SimpleUser
@@ -38,7 +38,7 @@ class SimpleUser {
 
   //SimpleUser -> Json
   Map<String, dynamic> toJson() {
-    String birthDtInCorrectFormat = DateFormat('yyyy-MM-dd').format(birthDt);
+    String birthDtInCorrectFormat = DateFormat('yyyy-MM-dd').format(birthDt!);
 
     return {
       'userId': id,
@@ -48,6 +48,12 @@ class SimpleUser {
       'gender': gender,
       'email': email,
       'tel': tel,
+    };
+  }
+
+  Map<String, dynamic> toJsonForCreateEvent() {
+    return {
+      'userId': id,
     };
   }
 }

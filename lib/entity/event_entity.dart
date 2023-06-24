@@ -44,4 +44,18 @@ class EventEntity {
         createDttm: json['createDttm'],
         owner: owner);
   }
+
+  //EventEntity -> Json
+  Map<String, dynamic> toJson() {
+    String eventDtInCorrectFormat = DateFormat('yyyy-MM-dd').format(eventDt);
+
+    return {
+      'eventTypeId': type,
+      'eventName': title,
+      'eventDt': eventDtInCorrectFormat,
+      'eventTm': eventTm,
+      'eventLoc': location,
+      'owner': owner?.toJsonForCreateEvent()
+    };
+  }
 }

@@ -1,5 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:event_creater/entity/event_entity.dart';
+import 'package:event_creater/entity/simple_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../widgets/header_widget.dart';
@@ -13,6 +19,8 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   final double _headerHeight = 150;
+  late int userId;
+  User? user;
 
   Map<String, int> types = {
     'Other': 0,
@@ -34,11 +42,23 @@ class _CreateEventState extends State<CreateEvent> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
-  final TextEditingController _typeController = TextEditingController(text: 'Other');
+  final TextEditingController _typeController =
+      TextEditingController(text: 'Other');
   final TextEditingController _locationController = TextEditingController();
 
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
+
+  // Get arguments from other page
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final int? receivedUserId =
+        ModalRoute.of(context)!.settings.arguments as int?;
+    if (receivedUserId != null) {
+      userId = receivedUserId;
+    }
+  }
 
   // Function for select event date
   Future<void> _selectDate(BuildContext context) async {
@@ -74,6 +94,27 @@ class _CreateEventState extends State<CreateEvent> {
         currentDateTime = selectedDateTime;
         _timeController.text = DateFormat('HH:mm').format(selectedDateTime);
       });
+    }
+  }
+
+  /// The function of save event in the database
+  Future<void> saveEvent() async {
+    EventEntity event = EventEntity(
+        type: types[_typeController.text]!,
+        title: _titleController.text,
+        eventDt: currentDate,
+        eventTm: _timeController.text,
+        location: _locationController.text,
+        owner: SimpleUser(id: userId));
+    var jsonBody = jsonEncode(event.toJson());
+    final response = await http.post(
+        Uri.parse('http://192.168.1.120:9000/event-creator/events/create'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonBody);
+    if (response.statusCode != 200) {
+      throw HttpException;
     }
   }
 
@@ -114,7 +155,7 @@ class _CreateEventState extends State<CreateEvent> {
                   ),
                 ),
                 TextButton(
-                    onPressed: () => print('awd'),
+                    onPressed: () => saveEvent(),
                     child: const Text(
                       'Save',
                       style: TextStyle(color: Colors.black, fontSize: 18.0),
@@ -123,10 +164,12 @@ class _CreateEventState extends State<CreateEvent> {
             ),
           ),
         ]),
+        // Form for create event
         Column(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
+              // Choose Date
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -139,6 +182,7 @@ class _CreateEventState extends State<CreateEvent> {
                     child: TextField(
                       controller: _dateController,
                       textAlign: TextAlign.center,
+                      readOnly: true,
                       decoration: const InputDecoration(
                         hintText: 'Event Date',
                         hintStyle: TextStyle(color: Color(0xFF9F9797)),
@@ -153,6 +197,7 @@ class _CreateEventState extends State<CreateEvent> {
                 ],
               ),
             ),
+            // Choose Time
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -165,6 +210,7 @@ class _CreateEventState extends State<CreateEvent> {
                   child: TextField(
                     controller: _timeController,
                     textAlign: TextAlign.center,
+                    readOnly: true,
                     decoration: const InputDecoration(
                       hintText: 'Event Time',
                       hintStyle: TextStyle(color: Color(0xFF9F9797)),
@@ -178,22 +224,25 @@ class _CreateEventState extends State<CreateEvent> {
                 ),
               ],
             ),
+            // Separate line
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 30.0),
               child: Divider(
                 color: Colors.black,
               ),
             ),
+            // Various for event type
             SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Text('Event Type:', style: TextStyle(
-                    fontFamily: 'Lobster',
-                    fontSize: 22.0,
-                    color: Color(0xFF9F9797),
-                  )),
+                  const Text('Event Type:',
+                      style: TextStyle(
+                        fontFamily: 'Lobster',
+                        fontSize: 22.0,
+                        color: Color(0xFF9F9797),
+                      )),
                   Column(
                     children: [
                       DropdownButton<String>(
@@ -206,25 +255,29 @@ class _CreateEventState extends State<CreateEvent> {
                             _typeController.text = newValue!;
                           });
                         },
-                        items: types.keys.map<DropdownMenuItem<String>>((String value) {
+                        items: types.keys
+                            .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
                           );
                         }).toList(),
-                        icon: const Icon(Icons.add, size: 0.0,),
+                        icon: const Icon(
+                          Icons.add,
+                          size: 0.0,
+                        ),
                         menuMaxHeight: 200.0,
                         style: const TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Lobster',
-                          fontSize: 24.0
-                        ),
+                            color: Colors.black,
+                            fontFamily: 'Lobster',
+                            fontSize: 24.0),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
+            // TextField for choose location
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -250,6 +303,7 @@ class _CreateEventState extends State<CreateEvent> {
                 ),
               ],
             ),
+            // Button for additional parameters
             Container(
               padding: const EdgeInsets.only(top: 30.0),
               child: Column(

@@ -371,7 +371,7 @@ class _RegistryState extends State<Registry> {
                           padding: const EdgeInsets.symmetric(vertical: 10.0),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/login');
+                              Navigator.pop(context);
                             },
                             child: const Text(
                               'Have an Account',

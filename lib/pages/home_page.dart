@@ -237,7 +237,7 @@ class _HomeState extends State<Home> {
                   TextButton(
                       onPressed: () {
                         FirebaseAuth.instance.signOut().then((value) {
-                          Navigator.pushNamed(context, "/login");
+                          Navigator.pushReplacementNamed(context, "/login");
                         });
                         return;
                       },

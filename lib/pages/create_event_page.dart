@@ -155,7 +155,7 @@ class _CreateEventState extends State<CreateEvent> {
                   ),
                 ),
                 TextButton(
-                    onPressed: () => saveEvent(),
+                    onPressed: () => {saveEvent(), Navigator.pop(context)},
                     child: const Text(
                       'Save',
                       style: TextStyle(color: Colors.black, fontSize: 18.0),

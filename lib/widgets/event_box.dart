@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../entity/event_entity.dart';
+
+// Widget for event
 class EventBox extends StatelessWidget {
-  final Color color;
-  final String name;
-  final String description;
+  final EventEntity event;
 
-  const EventBox(
-      {super.key,
-      required this.color,
-      required this.name,
-      required this.description});
+  const EventBox({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -29,26 +27,28 @@ class EventBox extends StatelessWidget {
             width: 50.0,
             margin: const EdgeInsets.only(left: 15.0),
             decoration: BoxDecoration(
-              color: color,
-              border: Border.all(width: 0, color: color),
+              color: Colors.grey,
+              border: Border.all(width: 0, color: Colors.grey),
               borderRadius: const BorderRadius.all(Radius.circular(100)),
             ),
           ),
           Container(
-            padding: EdgeInsets.only(left: 15.0),
+            padding: const EdgeInsets.only(left: 15.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  name,
+                  event.title,
                   style: const TextStyle(
                     fontSize: 16.0,
-                    color: Color(0xFF777777),
+                    color: Colors.black,
                   ),
                 ),
                 Text(
-                  description,
-                  style: TextStyle(fontSize: 14.0, color: Color(0xFF777777)),
+                  "${event.owner?.name} ${event.owner?.surname} - ${DateFormat('dd/MM/yyyy').format(event.eventDt)}",
+                  style:
+                      const TextStyle(fontSize: 12.0, color: Color(0xFF777777)),
                 )
               ],
             ),

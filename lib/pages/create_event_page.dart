@@ -137,7 +137,8 @@ class _CreateEventState extends State<CreateEvent> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () =>
+                        {saveEvent(), Navigator.pushNamed(context, '/home')},
                     icon: const Icon(Icons.arrow_back, size: 35.0)),
                 SizedBox(
                   width: 220.0,
@@ -155,7 +156,8 @@ class _CreateEventState extends State<CreateEvent> {
                   ),
                 ),
                 TextButton(
-                    onPressed: () => {saveEvent(), Navigator.pop(context)},
+                    onPressed: () =>
+                        {saveEvent(), Navigator.pushNamed(context, '/home')},
                     child: const Text(
                       'Save',
                       style: TextStyle(color: Colors.black, fontSize: 18.0),

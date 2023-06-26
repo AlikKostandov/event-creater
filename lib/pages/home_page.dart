@@ -29,7 +29,8 @@ Future<String?> signOut(BuildContext context) async {
 }
 
 class _HomeState extends State<Home> {
-  final double _headerHeight = 150;
+  final double _headerHeight = 135;
+  bool isLoading = true;
   List<EventEntity>? events;
   User? user;
   SimpleUser? simpleUser;
@@ -76,6 +77,10 @@ class _HomeState extends State<Home> {
         print('Ошибка: ${response.statusCode}');
       }
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -85,82 +90,89 @@ class _HomeState extends State<Home> {
     return Scaffold(
         key: _myKey,
         backgroundColor: const Color(0xFFE6E6E6),
-        body: Column(
-          children: [
-            Stack(children: <Widget>[
-              SizedBox(
-                height: _headerHeight,
-                child: HeaderWidget(
-                    _headerHeight), //let's create a common header widget
-              ),
-              // Header with avatar shape and userInfo
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20.0, top: 50.0, bottom: 20.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  Stack(children: <Widget>[
+                    SizedBox(
+                      height: _headerHeight,
+                      child: HeaderWidget(
+                          _headerHeight), //let's create a common header widget
+                    ),
+                    // Header with avatar shape and userInfo
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Avatar shape
-                        Container(
-                            height: 140.0,
-                            width: 140.0,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  width: 10.0,
-                                  color: const Color(0xFFE6E6E6),
-                                ),
-                                borderRadius: BorderRadius.circular(100)),
-                            child: const CircleAvatar(
-                              backgroundImage:
-                                  AssetImage('assets/img_avatar.png'),
-                            )),
-                        // UserInfo fields
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 20.0, top: 40.0, bottom: 15.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // Avatar shape
+                              Container(
+                                  height: 140.0,
+                                  width: 140.0,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: 10.0,
+                                        color: const Color(0xFFE6E6E6),
+                                      ),
+                                      borderRadius: BorderRadius.circular(100)),
+                                  child: const CircleAvatar(
+                                    backgroundImage:
+                                        AssetImage('assets/img_avatar.png'),
+                                  )),
+                              // UserInfo fields
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "${simpleUser?.name} ${simpleUser?.surname}",
+                                      style: const TextStyle(
+                                          fontSize: 24.0,
+                                          fontWeight: FontWeight.w800)),
+                                  Text(
+                                      "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('d MMMM yyyy').format(simpleUser!.birthDt!) : ""}",
+                                      style: const TextStyle(
+                                          fontSize: 14.0, color: Colors.grey)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Icon for open drawer
+                        Row(
                           children: [
-                            Text("${simpleUser?.name} ${simpleUser?.surname}",
-                                style: const TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.w800)),
-                            Text(
-                                "${simpleUser?.gender} ${simpleUser?.birthDt != null ? DateFormat('d MMMM yyyy').format(simpleUser!.birthDt!) : ""}",
-                                style: const TextStyle(
-                                    fontSize: 14.0, color: Colors.grey)),
+                            IconButton(
+                              onPressed: () =>
+                                  _myKey.currentState?.openEndDrawer(),
+                              icon: const Icon(Icons.menu),
+                              color: Colors.black,
+                              iconSize: 40,
+                              padding:
+                                  const EdgeInsets.only(top: 50.0, right: 20.0),
+                            ),
                           ],
                         ),
                       ],
                     ),
-                  ),
-                  // Icon for open drawer
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => _myKey.currentState?.openEndDrawer(),
-                        icon: const Icon(Icons.menu),
-                        color: Colors.black,
-                        iconSize: 40,
-                        padding: const EdgeInsets.only(top: 50.0, right: 20.0),
-                      ),
-                    ],
-                  ),
+                  ]),
+                  // List of events
+                  Expanded(
+                      child: ListView(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    children: events == null
+                        ? []
+                        : events!.map((e) => EventBox(event: e)).toList(),
+                  )),
                 ],
               ),
-            ]),
-            // List of events
-            Expanded(
-                child: ListView(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              children: events == null
-                  ? []
-                  : events!.map((e) => EventBox(event: e)).toList(),
-            )),
-          ],
-        ),
         // Drawer menu
         endDrawer: Drawer(
           width: 250.0,
@@ -253,7 +265,8 @@ class _HomeState extends State<Home> {
                   const Icon(Icons.add),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/add",
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/add', (route) => false,
                             arguments: simpleUser!.id);
                       },
                       child: Text(

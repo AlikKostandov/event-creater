@@ -19,6 +19,7 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   final double _headerHeight = 150;
+  final _formKey = GlobalKey<FormState>();
   late int userId;
   User? user;
 
@@ -65,8 +66,8 @@ class _CreateEventState extends State<CreateEvent> {
     final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: currentDate,
-        firstDate: DateTime(1950),
-        lastDate: DateTime(2027));
+        firstDate: currentDate,
+        lastDate: currentDate.add(const Duration(days: 365 * 3)));
     if (pickedDate != null && pickedDate != currentDate) {
       setState(() {
         currentDate = pickedDate;
@@ -121,203 +122,227 @@ class _CreateEventState extends State<CreateEvent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      children: [
-        //Header
-        Stack(children: <Widget>[
-          SizedBox(
-            height: _headerHeight,
-            child: HeaderWidget(
-                _headerHeight), //let's create a common header widget
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                    onPressed: () =>
-                        {saveEvent(), Navigator.pushNamed(context, '/home')},
-                    icon: const Icon(Icons.arrow_back, size: 35.0)),
-                SizedBox(
-                  width: 220.0,
-                  child: TextField(
-                    controller: _titleController,
-                    textAlign: TextAlign.center,
-                    decoration: const InputDecoration(
-                        hintText: 'Event Title',
-                        hintStyle: TextStyle(color: Color(0xFF9F9797)),
-                        border: InputBorder.none),
-                    style: const TextStyle(
-                        fontSize: 26.0,
-                        fontFamily: 'Lobster',
-                        color: Colors.white),
-                  ),
-                ),
-                TextButton(
-                    onPressed: () =>
-                        {saveEvent(), Navigator.pushNamed(context, '/home')},
-                    child: const Text(
-                      'Save',
-                      style: TextStyle(color: Colors.black, fontSize: 18.0),
-                    ))
-              ],
-            ),
-          ),
-        ]),
-        // Form for create event
-        Column(
+        body: SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              // Choose Date
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                      onPressed: () => _selectDate(context),
-                      icon: const Icon(Icons.calendar_today),
-                      iconSize: 40.0),
-                  SizedBox(
-                    width: 220.0,
-                    child: TextField(
-                      controller: _dateController,
-                      textAlign: TextAlign.center,
-                      readOnly: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Event Date',
-                        hintStyle: TextStyle(color: Color(0xFF9F9797)),
-                        border: InputBorder.none,
-                      ),
-                      style: const TextStyle(
-                          fontSize: 26.0,
-                          fontFamily: 'Lobster',
-                          color: Colors.black),
-                    ),
-                  ),
-                ],
+            //Header
+            Stack(children: <Widget>[
+              SizedBox(
+                height: _headerHeight,
+                child: HeaderWidget(_headerHeight),
               ),
-            ),
-            // Choose Time
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                    onPressed: () => _selectTime(context),
-                    icon: const Icon(Icons.access_time),
-                    iconSize: 40.0),
-                SizedBox(
-                  width: 220.0,
-                  child: TextField(
-                    controller: _timeController,
-                    textAlign: TextAlign.center,
-                    readOnly: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Event Time',
-                      hintStyle: TextStyle(color: Color(0xFF9F9797)),
-                      border: InputBorder.none,
-                    ),
-                    style: const TextStyle(
-                        fontSize: 26.0,
-                        fontFamily: 'Lobster',
-                        color: Colors.black),
-                  ),
-                ),
-              ],
-            ),
-            // Separate line
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30.0),
-              child: Divider(
-                color: Colors.black,
-              ),
-            ),
-            // Various for event type
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Text('Event Type:',
-                      style: TextStyle(
-                        fontFamily: 'Lobster',
-                        fontSize: 22.0,
-                        color: Color(0xFF9F9797),
-                      )),
-                  Column(
-                    children: [
-                      DropdownButton<String>(
-                        value: _typeController.text,
-                        underline: Container(
-                          height: 0.0,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _typeController.text = newValue!;
-                          });
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: () => {
+                              saveEvent(),
+                              Navigator.pushNamed(context, '/home')
+                            },
+                        icon: const Icon(Icons.arrow_back, size: 35.0)),
+                    SizedBox(
+                      width: 220.0,
+                      child: TextFormField(
+                        controller: _titleController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Give a name to the event';
+                          } else {
+                            return null;
+                          }
                         },
-                        items: types.keys
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        icon: const Icon(
-                          Icons.add,
-                          size: 0.0,
-                        ),
-                        menuMaxHeight: 200.0,
+                        textAlign: TextAlign.center,
+                        decoration: const InputDecoration(
+                            hintText: 'Event Title',
+                            hintStyle: TextStyle(color: Color(0xFF9F9797)),
+                            border: InputBorder.none),
                         style: const TextStyle(
-                            color: Colors.black,
+                            fontSize: 26.0,
                             fontFamily: 'Lobster',
-                            fontSize: 24.0),
+                            color: Colors.white),
+                      ),
+                    ),
+                    TextButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            await saveEvent();
+                            Navigator.pushNamed(context, '/home');
+                          }
+                        },
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.black, fontSize: 18.0),
+                        ))
+                  ],
+                ),
+              ),
+            ]),
+            // Form for create event
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  // Choose Date
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                          onPressed: () => _selectDate(context),
+                          icon: const Icon(Icons.calendar_today),
+                          iconSize: 40.0),
+                      SizedBox(
+                        width: 220.0,
+                        child: TextFormField(
+                          controller: _dateController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Set a date for the event';
+                            } else {
+                              return null;
+                            }
+                          },
+                          textAlign: TextAlign.center,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            hintText: 'Event Date',
+                            hintStyle: TextStyle(color: Color(0xFF9F9797)),
+                            border: InputBorder.none,
+                          ),
+                          style: const TextStyle(
+                              fontSize: 26.0,
+                              fontFamily: 'Lobster',
+                              color: Colors.black),
+                        ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            // TextField for choose location
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                    onPressed: () => print('Click'),
-                    icon: const Icon(Icons.map_outlined),
-                    iconSize: 40.0),
-                SizedBox(
-                  width: 220.0,
-                  child: TextField(
-                    controller: _locationController,
-                    textAlign: TextAlign.center,
-                    decoration: const InputDecoration(
-                      hintText: 'Location',
-                      hintStyle: TextStyle(color: Color(0xFF9F9797)),
-                      border: InputBorder.none,
+                ),
+                // Choose Time
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                        onPressed: () => _selectTime(context),
+                        icon: const Icon(Icons.access_time),
+                        iconSize: 40.0),
+                    SizedBox(
+                      width: 220.0,
+                      child: TextField(
+                        controller: _timeController,
+                        textAlign: TextAlign.center,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          hintText: 'Event Time',
+                          hintStyle: TextStyle(color: Color(0xFF9F9797)),
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(
+                            fontSize: 26.0,
+                            fontFamily: 'Lobster',
+                            color: Colors.black),
+                      ),
                     ),
-                    style: const TextStyle(
-                        fontSize: 26.0,
-                        fontFamily: 'Lobster',
-                        color: Colors.black),
+                  ],
+                ),
+                // Separate line
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30.0),
+                  child: Divider(
+                    color: Colors.black,
                   ),
                 ),
+                // Various for event type
+                SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      const Text('Event Type:',
+                          style: TextStyle(
+                            fontFamily: 'Lobster',
+                            fontSize: 22.0,
+                            color: Color(0xFF9F9797),
+                          )),
+                      Column(
+                        children: [
+                          DropdownButton<String>(
+                            value: _typeController.text,
+                            underline: Container(
+                              height: 0.0,
+                            ),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _typeController.text = newValue!;
+                              });
+                            },
+                            items: types.keys
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            icon: const Icon(
+                              Icons.add,
+                              size: 0.0,
+                            ),
+                            menuMaxHeight: 200.0,
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontFamily: 'Lobster',
+                                fontSize: 24.0),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                // TextField for choose location
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                        onPressed: () => print('Click'),
+                        icon: const Icon(Icons.map_outlined),
+                        iconSize: 40.0),
+                    SizedBox(
+                      width: 220.0,
+                      child: TextField(
+                        controller: _locationController,
+                        textAlign: TextAlign.center,
+                        decoration: const InputDecoration(
+                          hintText: 'Location',
+                          hintStyle: TextStyle(color: Color(0xFF9F9797)),
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(
+                            fontSize: 26.0,
+                            fontFamily: 'Lobster',
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                // Button for additional parameters
+                Container(
+                  padding: const EdgeInsets.only(top: 30.0),
+                  child: Column(
+                    children: const <Widget>[
+                      Text('Additional Parameters'),
+                      Icon(Icons.keyboard_double_arrow_down_sharp)
+                    ],
+                  ),
+                )
               ],
             ),
-            // Button for additional parameters
-            Container(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: Column(
-                children: const <Widget>[
-                  Text('Additional Parameters'),
-                  Icon(Icons.keyboard_double_arrow_down_sharp)
-                ],
-              ),
-            )
           ],
         ),
-      ],
+      ),
     ));
   }
 }

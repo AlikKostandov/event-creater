@@ -46,8 +46,8 @@ class _HomeState extends State<Home> {
 
   // Get SimpleUser by email of auth User
   Future<void> getUser(String? email) async {
-    final response = await http
-        .get(Uri.parse('{ipAddress}/event-creater/users?email=${email!}'));
+    final response = await http.get(Uri.parse(
+        'http://192.168.1.120:9000/event-creator/users?email=${email!}'));
     if (response.statusCode == 200) {
       String jsonBody = response.body;
       dynamic data = jsonDecode(jsonBody);
@@ -66,7 +66,7 @@ class _HomeState extends State<Home> {
   Future<void> getUserEvents(int? id) async {
     if (id != null) {
       final response = await http.get(Uri.parse(
-          '{ipAddress}/event-creater/events?userId=$id'));
+          'http://192.168.1.120:9000/event-creator/events?userId=$id'));
       if (response.statusCode == 200) {
         String jsonBody = response.body;
         final parsed = jsonDecode(jsonBody).cast<Map<String, dynamic>>();
@@ -81,6 +81,16 @@ class _HomeState extends State<Home> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> removeEvent(int? id) async {
+    if (id != null) {
+      final response = await http.delete(Uri.parse(
+          'http://192.168.1.120:9000/event-creator/events/delete?eventId=$id'));
+      if (response.statusCode != 200) {
+        print('Ошибка: ${response.statusCode}');
+      }
+    }
   }
 
   @override
@@ -169,7 +179,16 @@ class _HomeState extends State<Home> {
                     shrinkWrap: true,
                     children: events == null
                         ? []
-                        : events!.map((e) => EventBox(event: e)).toList(),
+                        : events!
+                            .map((e) => EventBox(
+                                  event: e,
+                                  onDismissed: () {
+                                    removeEvent(e.id);
+                                    events!.removeWhere(
+                                        (element) => element.id == e.id);
+                                  },
+                                ))
+                            .toList(),
                   )),
                 ],
               ),

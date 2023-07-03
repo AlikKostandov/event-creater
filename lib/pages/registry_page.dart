@@ -148,7 +148,7 @@ class _RegistryState extends State<Registry> {
         email: _emailController.text);
     var jsonBody = jsonEncode(user.toJson());
     final response = await http.post(
-        Uri.parse('http://192.168.1.120:9000/event-creater/users/registry'),
+        Uri.parse('http://192.168.1.120:9000/event-creator/users/registry'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },

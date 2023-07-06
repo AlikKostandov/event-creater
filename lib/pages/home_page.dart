@@ -83,16 +83,6 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future<void> removeEvent(int? id) async {
-    if (id != null) {
-      final response = await http.delete(Uri.parse(
-          'http://192.168.1.120:9000/event-creator/events/delete?eventId=$id'));
-      if (response.statusCode != 200) {
-        print('Ошибка: ${response.statusCode}');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> _myKey = new GlobalKey<ScaffoldState>();
@@ -183,7 +173,6 @@ class _HomeState extends State<Home> {
                             .map((e) => EventBox(
                                   event: e,
                                   onDismissed: () {
-                                    removeEvent(e.id);
                                     events!.removeWhere(
                                         (element) => element.id == e.id);
                                   },

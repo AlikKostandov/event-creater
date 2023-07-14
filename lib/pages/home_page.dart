@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
 import 'package:event_creater/entity/event_entity.dart';
 import 'package:event_creater/entity/simple_user.dart';
@@ -8,6 +9,8 @@ import 'package:event_creater/widgets/header_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
@@ -77,10 +80,43 @@ class _HomeState extends State<Home> {
         print('Ошибка: ${response.statusCode}');
       }
     }
-
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> uploadImage(int? id) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+
+      final compressedImage = await FlutterImageCompress.compressWithFile(
+        imageFile.path,
+        quality: 50,
+      );
+
+      if (id != null && compressedImage != null) {
+        String image = base64Encode(compressedImage);
+
+        final response = await http.put(
+            Uri.parse(
+                'http://192.168.1.120:9000/event-creator/users/$id/avatar-upload'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: image);
+
+        if (response.statusCode == 200) {
+          setState(() {
+            isLoading = false;
+          });
+        } else {
+          print('Ошибка: ${response.statusCode}');
+        }
+      }
+    }
   }
 
   @override
@@ -123,9 +159,14 @@ class _HomeState extends State<Home> {
                                         color: const Color(0xFFE6E6E6),
                                       ),
                                       borderRadius: BorderRadius.circular(100)),
-                                  child: const CircleAvatar(
-                                    backgroundImage:
-                                        AssetImage('assets/img_avatar.png'),
+                                  child: CircleAvatar(
+                                    backgroundImage: const AssetImage(
+                                        'assets/img_avatar.png'),
+                                    child: InkWell(
+                                      onTap: () async =>
+                                          await uploadImage(simpleUser!.id),
+                                      child: null,
+                                    ),
                                   )),
                               // UserInfo fields
                               Column(

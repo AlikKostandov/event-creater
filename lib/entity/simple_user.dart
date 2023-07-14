@@ -9,6 +9,7 @@ class SimpleUser {
   String? gender;
   String? email;
   String? tel;
+  String? avatarImg;
 
   SimpleUser(
       {this.id,
@@ -17,7 +18,8 @@ class SimpleUser {
       this.birthDt,
       this.gender,
       this.email,
-      this.tel});
+      this.tel,
+      this.avatarImg});
 
   //Json -> SimpleUser
   factory SimpleUser.fromJson(Map<String, dynamic> json) {

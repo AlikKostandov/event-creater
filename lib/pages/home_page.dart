@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:event_creater/entity/event_entity.dart';
 import 'package:event_creater/entity/simple_user.dart';
@@ -37,6 +38,7 @@ class _HomeState extends State<Home> {
   List<EventEntity>? events;
   User? user;
   SimpleUser? simpleUser;
+  Uint8List? decodedImage;
 
   @override
   void initState() {
@@ -59,6 +61,7 @@ class _HomeState extends State<Home> {
       });
       if (simpleUser != null) {
         getUserEvents(simpleUser!.id);
+        getUserAvatar(simpleUser!.id);
       }
     } else {
       print('Ошибка: ${response.statusCode}');
@@ -85,6 +88,7 @@ class _HomeState extends State<Home> {
     });
   }
 
+  // Upload avatar for user
   Future<void> uploadImage(int? id) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -117,6 +121,23 @@ class _HomeState extends State<Home> {
         }
       }
     }
+  }
+
+  // Get user avatar by SimpleUser id
+  Future<void> getUserAvatar(int? id) async {
+    if (id != null) {
+      final response = await http.get(Uri.parse(
+          'http://192.168.1.120:9000/event-creator/users/$id/avatar'));
+      if (response.statusCode == 200) {
+        String avatar = response.body;
+        decodedImage = base64Decode(avatar);
+      } else {
+        print('Ошибка: ${response.statusCode}');
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -160,11 +181,16 @@ class _HomeState extends State<Home> {
                                       ),
                                       borderRadius: BorderRadius.circular(100)),
                                   child: CircleAvatar(
-                                    backgroundImage: const AssetImage(
-                                        'assets/img_avatar.png'),
+                                    backgroundImage: decodedImage != null
+                                        ? MemoryImage(decodedImage!)
+                                        : const AssetImage(
+                                                'assets/img_avatar.png')
+                                            as ImageProvider<Object>?,
                                     child: InkWell(
                                       onTap: () async =>
-                                          await uploadImage(simpleUser!.id),
+                                          decodedImage == null
+                                              ? uploadImage(simpleUser!.id)
+                                              : null,
                                       child: null,
                                     ),
                                   )),

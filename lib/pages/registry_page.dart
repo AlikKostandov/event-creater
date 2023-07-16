@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:event_creater/entity/simple_user.dart';
+import 'package:event_creater/services/user_service.dart';
 import 'package:event_creater/widgets/stylized_field.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,9 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:event_creater/widgets/header_widget.dart';
-
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../auth.dart';
 
@@ -135,26 +133,6 @@ class _RegistryState extends State<Registry> {
         currentDate = pickedDate;
         _birthController.text = DateFormat('dd.MM.yyyy').format(currentDate);
       });
-    }
-  }
-
-  /// The function of user registration in the database
-  Future<void> registerUser() async {
-    SimpleUser user = SimpleUser(
-        name: _nameController.text,
-        surname: _surnameController.text,
-        gender: gender!,
-        birthDt: currentDate,
-        email: _emailController.text);
-    var jsonBody = jsonEncode(user.toJson());
-    final response = await http.post(
-        Uri.parse('http://192.168.1.120:9000/event-creator/users/registry'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonBody);
-    if (response.statusCode != 200) {
-      throw HttpException;
     }
   }
 
@@ -339,7 +317,12 @@ class _RegistryState extends State<Registry> {
                                     }
                                   }
                                   try {
-                                    await registerUser();
+                                    await UserService.registerUser(SimpleUser(
+                                        name: _nameController.text,
+                                        surname: _surnameController.text,
+                                        gender: gender!,
+                                        birthDt: currentDate,
+                                        email: _emailController.text));
                                   } on HttpException {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

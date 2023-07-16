@@ -1,11 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:event_creater/entity/event_entity.dart';
 import 'package:event_creater/entity/simple_user.dart';
+import 'package:event_creater/services/event_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../widgets/header_widget.dart';
@@ -98,27 +95,6 @@ class _CreateEventState extends State<CreateEvent> {
     }
   }
 
-  /// The function of save event in the database
-  Future<void> saveEvent() async {
-    EventEntity event = EventEntity(
-        type: types[_typeController.text]!,
-        title: _titleController.text,
-        eventDt: currentDate,
-        eventTm: _timeController.text,
-        location: _locationController.text,
-        owner: SimpleUser(id: userId));
-    var jsonBody = jsonEncode(event.toJson());
-    final response = await http.post(
-        Uri.parse('http://192.168.1.120:9000/event-creator/events/create'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonBody);
-    if (response.statusCode != 200) {
-      throw HttpException;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,10 +116,8 @@ class _CreateEventState extends State<CreateEvent> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
-                        onPressed: () => {
-                              saveEvent(),
-                              Navigator.pushNamed(context, '/home')
-                            },
+                        onPressed: () =>
+                            {Navigator.pushReplacementNamed(context, '/home')},
                         icon: const Icon(Icons.arrow_back, size: 35.0)),
                     SizedBox(
                       width: 220.0,
@@ -170,8 +144,14 @@ class _CreateEventState extends State<CreateEvent> {
                     TextButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await saveEvent();
-                            Navigator.pushNamed(context, '/home');
+                            await EventService.saveEvent(EventEntity(
+                                type: types[_typeController.text]!,
+                                title: _titleController.text,
+                                eventDt: currentDate,
+                                eventTm: _timeController.text,
+                                location: _locationController.text,
+                                owner: SimpleUser(id: userId)));
+                            Navigator.pushReplacementNamed(context, '/home');
                           }
                         },
                         child: const Text(

@@ -1,17 +1,14 @@
-import 'dart:convert';
 import 'dart:core';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:event_creater/entity/event_entity.dart';
 import 'package:event_creater/entity/simple_user.dart';
+import 'package:event_creater/services/event_service.dart';
+import 'package:event_creater/services/user_service.dart';
 import 'package:event_creater/widgets/event_box.dart';
 import 'package:event_creater/widgets/header_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
@@ -45,96 +42,16 @@ class _HomeState extends State<Home> {
     super.initState();
     user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      getUser(user!.email);
-    }
-  }
-
-  // Get SimpleUser by email of auth User
-  Future<void> getUser(String? email) async {
-    final response = await http.get(Uri.parse(
-        'http://192.168.1.120:9000/event-creator/users?email=${email!}'));
-    if (response.statusCode == 200) {
-      String jsonBody = response.body;
-      dynamic data = jsonDecode(jsonBody);
       setState(() {
-        simpleUser = SimpleUser.fromJson(data);
+        _fetchUserData();
       });
-      if (simpleUser != null) {
-        getUserEvents(simpleUser!.id);
-        getUserAvatar(simpleUser!.id);
-      }
-    } else {
-      print('Ошибка: ${response.statusCode}');
     }
   }
 
-  // Get events list by SimpleUser's id
-  Future<void> getUserEvents(int? id) async {
-    if (id != null) {
-      final response = await http.get(Uri.parse(
-          'http://192.168.1.120:9000/event-creator/events?userId=$id'));
-      if (response.statusCode == 200) {
-        String jsonBody = response.body;
-        final parsed = jsonDecode(jsonBody).cast<Map<String, dynamic>>();
-        events = parsed
-            .map<EventEntity>((json) => EventEntity.fromJson(json))
-            .toList();
-      } else {
-        print('Ошибка: ${response.statusCode}');
-      }
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  // Upload avatar for user
-  Future<void> uploadImage(int? id) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      final imageFile = File(pickedFile.path);
-
-      final compressedImage = await FlutterImageCompress.compressWithFile(
-        imageFile.path,
-        quality: 50,
-      );
-
-      if (id != null && compressedImage != null) {
-        String image = base64Encode(compressedImage);
-
-        final response = await http.put(
-            Uri.parse(
-                'http://192.168.1.120:9000/event-creator/users/$id/avatar-upload'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8'
-            },
-            body: image);
-
-        if (response.statusCode == 200) {
-          setState(() {
-            isLoading = false;
-          });
-        } else {
-          print('Ошибка: ${response.statusCode}');
-        }
-      }
-    }
-  }
-
-  // Get user avatar by SimpleUser id
-  Future<void> getUserAvatar(int? id) async {
-    if (id != null) {
-      final response = await http.get(Uri.parse(
-          'http://192.168.1.120:9000/event-creator/users/$id/avatar'));
-      if (response.statusCode == 200) {
-        String avatar = response.body;
-        decodedImage = base64Decode(avatar);
-      } else {
-        print('Ошибка: ${response.statusCode}');
-      }
-    }
+  Future<void> _fetchUserData() async {
+    simpleUser = await UserService.getUser(user!.email);
+    events = await EventService.getUserEvents(simpleUser!.id);
+    decodedImage = await UserService.getUserAvatar(simpleUser!.id);
     setState(() {
       isLoading = false;
     });
@@ -187,10 +104,14 @@ class _HomeState extends State<Home> {
                                                 'assets/img_avatar.png')
                                             as ImageProvider<Object>?,
                                     child: InkWell(
-                                      onTap: () async =>
-                                          decodedImage == null
-                                              ? uploadImage(simpleUser!.id)
-                                              : null,
+                                      onTap: () async {
+                                        if (decodedImage == null) {
+                                          await UserService.uploadAvatar(
+                                              simpleUser!.id);
+                                          Navigator.pushReplacementNamed(
+                                              context, '/home');
+                                        }
+                                      },
                                       child: null,
                                     ),
                                   )),

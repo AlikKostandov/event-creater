@@ -8,6 +8,7 @@ import 'package:event_creater/services/user_service.dart';
 import 'package:event_creater/widgets/event_box.dart';
 import 'package:event_creater/widgets/header_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,7 +32,11 @@ Future<String?> signOut(BuildContext context) async {
 
 class _HomeState extends State<Home> {
   final double _headerHeight = 135;
+
   bool isLoading = true;
+  bool _isCreateButtonVisible = true;
+  final ScrollController _scrollController = ScrollController();
+
   List<EventEntity>? events;
   User? user;
   SimpleUser? simpleUser;
@@ -41,11 +46,34 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     user = FirebaseAuth.instance.currentUser;
+
+    _scrollController.addListener(() {
+      if (_scrollController.offset <
+              _scrollController.position.maxScrollExtent &&
+          _isCreateButtonVisible) {
+        setState(() {
+          _isCreateButtonVisible = false;
+        });
+      } else if (_scrollController.offset <=
+              _scrollController.position.minScrollExtent &&
+          !_isCreateButtonVisible) {
+        setState(() {
+          _isCreateButtonVisible = true;
+        });
+      }
+    });
+
     if (user != null) {
       setState(() {
         _fetchUserData();
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchUserData() async {
@@ -152,20 +180,23 @@ class _HomeState extends State<Home> {
                   ]),
                   // List of events
                   Expanded(
-                      child: ListView(
+                      child: ListView.builder(
+                    controller: _scrollController,
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    children: events == null
-                        ? []
-                        : events!
-                            .map((e) => EventBox(
-                                  event: e,
-                                  onDismissed: () {
-                                    events!.removeWhere(
-                                        (element) => element.id == e.id);
-                                  },
-                                ))
-                            .toList(),
+                    itemCount: events == null ? 0 : events!.length,
+                    itemBuilder: (context, index) {
+                      final e = events![index];
+                      return EventBox(
+                        event: e,
+                        onDismissed: () {
+                          setState(() {
+                            events!
+                                .removeWhere((element) => element.id == e.id);
+                          });
+                        },
+                      );
+                    },
                   )),
                 ],
               ),
@@ -256,25 +287,20 @@ class _HomeState extends State<Home> {
                       ))
                 ],
               ),
-              Row(
-                children: [
-                  const Icon(Icons.add),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, '/add', (route) => false,
-                            arguments: simpleUser!.id);
-                      },
-                      child: Text(
-                        'Create event'.toUpperCase(),
-                        style: const TextStyle(
-                            fontSize: 20.0,
-                            fontFamily: 'Mukta',
-                            letterSpacing: 2.0),
-                      ))
-                ],
-              ),
             ],
+          ),
+        ),
+        // Button for route in create page
+        floatingActionButton: Visibility(
+          visible: _isCreateButtonVisible,
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/add', (route) => false,
+                  arguments: simpleUser!.id);
+            },
+            backgroundColor: CupertinoColors.activeBlue,
+            child: const Icon(Icons.add, size: 25.0),
           ),
         ),
         // Bottom navigation bar

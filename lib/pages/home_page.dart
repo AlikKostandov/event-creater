@@ -296,7 +296,7 @@ class _HomeState extends State<Home> {
           child: FloatingActionButton(
             onPressed: () {
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/add', (route) => false,
+                  context, '/create', (route) => false,
                   arguments: simpleUser!.id);
             },
             backgroundColor: CupertinoColors.activeBlue,

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:event_creater/firebase_options.dart';
-import 'package:event_creater/pages/create_event_page.dart';
+import 'package:event_creater/pages/event_page.dart';
 import 'package:event_creater/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -69,7 +69,8 @@ class _MyAppState extends State<MyApp> {
           '/login': (context) => const Login(),
           '/registry': (context) => const Registry(),
           '/home': (context) => const Home(),
-          '/add': (context) => const CreateEvent()
+          '/create': (context) => const EventPage(),
+          '/edit': (context) => const EventPage()
         });
   }
 }

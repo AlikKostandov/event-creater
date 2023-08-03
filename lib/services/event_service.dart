@@ -34,6 +34,22 @@ class EventService {
     }
   }
 
+  // The function of edit event in the db
+  static Future<void> editEvent(EventEntity event) async {
+    var jsonBody = jsonEncode(event.toJson());
+    int? eventId = event.id;
+    final response = await http.put(
+        Uri.parse(
+            'http://192.168.1.120:9000/event-creator/events/edit/$eventId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonBody);
+    if (response.statusCode != 200) {
+      throw const HttpException('Failed to save event');
+    }
+  }
+
   // Remove event from db
   static Future<void> removeEvent(int? id) async {
     if (id != null) {

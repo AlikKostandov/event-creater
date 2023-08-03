@@ -54,7 +54,7 @@ class EventService {
   static Future<void> removeEvent(int? id) async {
     if (id != null) {
       final response = await http.delete(Uri.parse(
-          'http://192.168.1.120:9000/event-creator/events/delete?eventId=$id'));
+          'http://192.168.1.120:9000/event-creator/events/delete/$id'));
       if (response.statusCode != 200) {
         throw const HttpException('Failed to remove event');
       }
@@ -65,7 +65,7 @@ class EventService {
   static Future<void> archiveEvent(int? id) async {
     if (id != null) {
       final response = await http.put(Uri.parse(
-          'http://192.168.1.120:9000/event-creator/events/archive?eventId=$id'));
+          'http://192.168.1.120:9000/event-creator/events/archive/$id'));
       if (response.statusCode != 200) {
         throw const HttpException('Failed to archive event');
       }

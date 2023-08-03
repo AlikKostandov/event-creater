@@ -7,18 +7,19 @@ import 'package:intl/intl.dart';
 
 import '../widgets/header_widget.dart';
 
-class CreateEvent extends StatefulWidget {
-  const CreateEvent({super.key});
+class EventPage extends StatefulWidget {
+  const EventPage({super.key});
 
   @override
-  State<CreateEvent> createState() => _CreateEventState();
+  State<EventPage> createState() => _EventPageState();
 }
 
-class _CreateEventState extends State<CreateEvent> {
+class _EventPageState extends State<EventPage> {
   final double _headerHeight = 150;
   final _formKey = GlobalKey<FormState>();
-  late int userId;
+  int? userId;
   User? user;
+  EventEntity? event;
 
   Map<String, int> types = {
     'Other': 0,
@@ -51,10 +52,19 @@ class _CreateEventState extends State<CreateEvent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final int? receivedUserId =
-        ModalRoute.of(context)!.settings.arguments as int?;
-    if (receivedUserId != null) {
-      userId = receivedUserId;
+
+    final args = ModalRoute.of(context)!.settings.arguments;
+
+    if (args is int) {
+      userId = args;
+    } else if (args is EventEntity) {
+      event = args;
+      _titleController.text = event!.title;
+      _dateController.text = DateFormat('dd.MM.yyyy').format(event!.eventDt);
+      _timeController.text =
+          event!.eventTm != null ? event!.eventTm!.substring(0, 5) : '';
+      _typeController.text = types.keys.elementAt(event!.type);
+      _locationController.text = event?.location ?? '';
     }
   }
 
@@ -144,13 +154,24 @@ class _CreateEventState extends State<CreateEvent> {
                     TextButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await EventService.saveEvent(EventEntity(
+                            if (event == null) {
+                              await EventService.saveEvent(EventEntity(
+                                  type: types[_typeController.text]!,
+                                  title: _titleController.text,
+                                  eventDt: currentDate,
+                                  eventTm: _timeController.text,
+                                  location: _locationController.text,
+                                  owner: SimpleUser(id: userId)));
+                            } else {
+                              await EventService.editEvent(EventEntity(
+                                id: event!.id,
                                 type: types[_typeController.text]!,
                                 title: _titleController.text,
                                 eventDt: currentDate,
                                 eventTm: _timeController.text,
                                 location: _locationController.text,
-                                owner: SimpleUser(id: userId)));
+                              ));
+                            }
                             Navigator.pushReplacementNamed(context, '/home');
                           }
                         },

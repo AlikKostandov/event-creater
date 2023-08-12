@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:event_creater/firebase_options.dart';
 import 'package:event_creater/pages/event_page.dart';
 import 'package:event_creater/pages/home_page.dart';
+import 'package:event_creater/pages/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -58,10 +59,10 @@ class _MyAppState extends State<MyApp> {
           },
         ),
         theme: ThemeData(
-          primaryColor: const Color(0xff090979),
+          primaryColor: const Color(0xffff6e27),
           colorScheme: ColorScheme.fromSwatch()
-              .copyWith(secondary: const Color(0xff00d4ff)),
-          primarySwatch: Colors.blue,
+              .copyWith(secondary: const Color(0xfffbf665)),
+          primarySwatch: Colors.yellow,
         ),
         initialRoute:
             FirebaseAuth.instance.currentUser == null ? '/login' : '/home',
@@ -70,7 +71,8 @@ class _MyAppState extends State<MyApp> {
           '/registry': (context) => const Registry(),
           '/home': (context) => const Home(),
           '/create': (context) => const EventPage(),
-          '/edit': (context) => const EventPage()
+          '/edit': (context) => const EventPage(),
+          '/profile': (context) => const ProfilePage()
         });
   }
 }

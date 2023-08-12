@@ -132,9 +132,9 @@ class _HomeState extends State<Home> {
                                                 'assets/img_avatar.png')
                                             as ImageProvider<Object>?,
                                     child: InkWell(
-                                      onTap: () async {
+                                      onTap: () {
                                         if (decodedImage == null) {
-                                          await UserService.uploadAvatar(
+                                          UserService.uploadAvatar(
                                               simpleUser!.id);
                                           Navigator.pushReplacementNamed(
                                               context, '/home');
@@ -211,7 +211,9 @@ class _HomeState extends State<Home> {
                   const Icon(Icons.person),
                   TextButton(
                       onPressed: () {
-                        print('Profile');
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/profile', (route) => false,
+                            arguments: simpleUser!.email);
                       },
                       child: Text(
                         'Profile'.toUpperCase(),

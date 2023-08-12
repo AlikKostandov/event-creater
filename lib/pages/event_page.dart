@@ -128,7 +128,7 @@ class _EventPageState extends State<EventPage> {
                     IconButton(
                         onPressed: () =>
                             {Navigator.pushReplacementNamed(context, '/home')},
-                        icon: const Icon(Icons.arrow_back, size: 35.0)),
+                        icon: const Icon(Icons.arrow_back_ios, size: 35.0)),
                     SizedBox(
                       width: 220.0,
                       child: TextFormField(
@@ -146,9 +146,10 @@ class _EventPageState extends State<EventPage> {
                             hintStyle: TextStyle(color: Color(0xFF9F9797)),
                             border: InputBorder.none),
                         style: const TextStyle(
-                            fontSize: 26.0,
-                            fontFamily: 'Lobster',
-                            color: Colors.white),
+                          fontSize: 28.0,
+                          fontFamily: 'Lobster',
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                     TextButton(
